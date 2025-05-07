@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weather-dashboard-new
+  labels:
+    app: weather-dashboard-new
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: weather-dashboard-new
+  template:
+    metadata:
+      labels:
+        app: weather-dashboard-new
+    spec:
+      containers:
+      - name: weather-dashboard-new
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: dashboard-files
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: dashboard-files
+        configMap:
+          name: weather-dashboard-new-files
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: weather-dashboard-new
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: weather-dashboard-new

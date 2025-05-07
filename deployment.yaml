@@ -1,0 +1,80 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weather-data-service
+  labels:
+    app: weather-data-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: weather-data-service
+  template:
+    metadata:
+      labels:
+        app: weather-data-service
+    spec:
+      containers:
+      - name: weather-data-service
+        image: weatheracr861.azurecr.io/weather-data-service:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: DB_SERVER
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: DB_SERVER
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: DB_NAME
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: DB_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: DB_PASSWORD
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
